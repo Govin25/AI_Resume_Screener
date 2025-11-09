@@ -1,5 +1,5 @@
 from fastapi import APIRouter, File, HTTPException, UploadFile
-from services.resume_pdf_service import process_resume_pdf
+from services.resume_pdf_service import process_resume_pdf, get_resumes
 
 
 
@@ -18,3 +18,8 @@ async def resume_upload(file: UploadFile = File(...)):
     
     return resp
 
+
+@router.get("/resumes")
+async def fetch_all_resumes():
+    resumes = await get_resumes()
+    return resumes
