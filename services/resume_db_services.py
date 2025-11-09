@@ -1,9 +1,15 @@
 import asyncpg
-
+import os
 
 async def create_connection():
-    conn = await asyncpg.connect(user='postgres', password='password',
-                                 database='resume_screener', host='localhost', port=5434)
+    user = os.getenv('POSTGRES_USER')
+    password = os.getenv('POSTGRES_PASSWORD')
+    database = os.getenv('POSTGRES_DB')
+    host = os.getenv('POSTGRES_HOST')
+    port = os.getenv('POSTGRES_PORT')
+
+    conn = await asyncpg.connect(user=user, password=password,
+                                 database=database, host=host, port=port)
     return conn
 
 
