@@ -42,6 +42,19 @@ async def get_resumes():
         })
     return {"resumes": clean_resumes}
 
+async def download_resume_by_id(resume_id):
+    conn = await create_connection()
+    query = "SELECT uploaded_path, actual_name FROM resumes WHERE resume_id = $1;"
+    row = await conn.fetchrow(query, resume_id)
+    await conn.close()
+    
+    return row
+    
+
+
+
+
+
 
 
 #     CREATE TABLE resumes (
