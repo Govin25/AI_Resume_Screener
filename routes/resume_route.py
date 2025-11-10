@@ -1,5 +1,5 @@
 from fastapi import APIRouter, File, HTTPException, UploadFile
-from services.resume_pdf_service import process_resume_pdf, get_resumes, download_resume_by_id
+from services.resume_service import process_resume_pdf, get_resumes, download_resume_by_id
 from fastapi.responses import FileResponse
 
 
