@@ -4,9 +4,9 @@ import os
 
 async def create_connection():
     """Create and return a connection to the PostgreSQL database."""
+    database = os.getenv("POSTGRES_DB")
     user = os.getenv("POSTGRES_USER")
     password = os.getenv("POSTGRES_PASSWORD")
-    database = os.getenv("POSTGRES_DB")
     host = os.getenv("POSTGRES_HOST")
     port = os.getenv("POSTGRES_PORT")
 
