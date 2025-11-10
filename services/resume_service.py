@@ -1,5 +1,5 @@
 import uuid
-from services.resume_db_services import create_connection, get_all_resumes
+from services.db_services import create_connection, get_all_resumes
 from datetime import timezone, timedelta
 
 
@@ -57,11 +57,3 @@ async def download_resume_by_id(resume_id):
 
 
 
-#     CREATE TABLE resumes (
-#     resume_id UUID PRIMARY KEY,
-#     uploaded_path VARCHAR(255) NOT NULL,
-#     actual_name VARCHAR(255) NOT NULL,
-#     file_format VARCHAR(20) NOT NULL,
-#     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-
-# );

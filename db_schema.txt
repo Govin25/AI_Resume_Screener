@@ -1,0 +1,20 @@
+CREATE TABLE resumes (
+    resume_id UUID PRIMARY KEY,
+    uploaded_path VARCHAR(255) NOT NULL,
+    actual_name VARCHAR(255) NOT NULL,
+    file_format VARCHAR(20) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+
+CREATE TABLE job_descriptions (
+    jd_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(255),
+    company_name VARCHAR(255),
+    jd_text TEXT NOT NULL,
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+
