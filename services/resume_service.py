@@ -1,7 +1,6 @@
 import uuid
 from services.db_services import create_connection, get_all_resumes
-from datetime import timezone, timedelta
-
+from utils.utility import format_datetime_to_ist
 
 async def process_resume_pdf(file):
     """
@@ -29,16 +28,15 @@ async def process_resume_pdf(file):
 
 async def get_resumes():
     resumes = await get_all_resumes()
-    # define IST timezone once
-    IST = timezone(timedelta(hours=5, minutes=30))
+    
 
     clean_resumes = []
     for r in resumes:
-        created_at = r["created_at"].astimezone(IST).strftime("%Y-%m-%d %H:%M:%S") 
+         
         clean_resumes.append({
             "resume_id": r["resume_id"],
             "actual_name": r["actual_name"],
-            "created_at": created_at
+            "created_at": format_datetime_to_ist(r["created_at"])
         })
     return {"resumes": clean_resumes}
 
