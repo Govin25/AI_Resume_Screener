@@ -13,13 +13,15 @@ async def process_resume_pdf(file):
     file_name = f"resume_{resume_id}.pdf"
     file_path = f"./uploads/pdf/{file_name}"
 
-    insert_query = "INSERT INTO resumes(resume_id,uploaded_path,actual_name,file_format) VALUES($1, $2, $3, $4);"
-    resp = await conn.execute(insert_query, resume_id, file_path, file.filename, "pdf")
-    print(resp)
 
     with open(file_path, "wb") as f:
         content = await file.read()
         f.write(content)
+
+
+    insert_query = "INSERT INTO resumes(resume_id,uploaded_path,actual_name,file_format) VALUES($1, $2, $3, $4);"
+    resp = await conn.execute(insert_query, resume_id, file_path, file.filename, "pdf")
+    print(resp)
 
     await conn.close()
 
