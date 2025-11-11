@@ -2,10 +2,11 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from services.resume_service import (
     process_resume_pdf,
     get_resumes,
-    download_resume_by_id,
+    get_resume_by_id,
+    delete_resume_service
 )
 from fastapi.responses import FileResponse
-
+from uuid import UUID
 
 router = APIRouter()
 
@@ -31,11 +32,11 @@ async def fetch_all_resumes():
 
 
 @router.get("/resumes/{resume_id}/download")
-async def download_resume(resume_id: str):
-    row = await download_resume_by_id(resume_id)
+async def download_resume(resume_id: UUID):
+    row = await get_resume_by_id(resume_id)
 
     if not row:
-        raise HTTPException(status_code=404, detail="Resume not found")
+        raise HTTPException(status_code=404, detail=f"Resume not found for id: {resume_id}")
 
     file_path = row["uploaded_path"]
     file_name = row["actual_name"]
@@ -43,3 +44,17 @@ async def download_resume(resume_id: str):
     return FileResponse(
         path=file_path, filename=file_name, media_type="application/pdf"
     )
+
+
+@router.delete("/resumes/{resume_id}")
+async def delete_resume(resume_id: UUID):
+   
+   row = await get_resume_by_id(resume_id)
+   
+   if not row:
+        raise HTTPException(status_code=404, detail=f"Resume not found for id: {resume_id}")
+
+   path = dict(row)['uploaded_path']
+   await delete_resume_service(resume_id, path) 
+
+   return f"Resume {resume_id} delete successfully"
