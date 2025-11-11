@@ -3,7 +3,7 @@ import aiofiles
 from pathlib import Path
 from services.db_services import create_connection, get_all_resumes
 from utils.utility import format_datetime_to_ist
-
+import os
 
 BASE_DIR = Path(__file__).resolve().parent
 UPLOADS_DIR = BASE_DIR / "uploads" / "pdf" 
@@ -44,10 +44,24 @@ async def get_resumes():
     return {"resumes": clean_resumes}
 
 
-async def download_resume_by_id(resume_id):
+async def get_resume_by_id(resume_id):
     conn = await create_connection()
     query = "SELECT uploaded_path, actual_name FROM resumes WHERE resume_id = $1;"
     row = await conn.fetchrow(query, resume_id)
     await conn.close()
 
     return row
+
+
+async def delete_resume_service(resume_id, path):
+    file_path = Path(path)
+    if file_path.exists():
+        file_path.unlink()
+        print(f"file deleted in disk for path: {file_path}")
+    else:
+        print(f"No file exist in disk for path: {file_path}")
+
+    conn = await create_connection()
+    query = "DELETE FROM resumes WHERE resume_id = $1;"
+    await conn.execute(query, resume_id)
+    await conn.close()
