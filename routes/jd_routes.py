@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from services.jd_services import insert_jd_into_db, get_all_jds
-from schemas.jd_schema import JobDescription
-
+from schemas.jd_schema import JobDescription, JobDescriptionListResponse
+from typing import List
 
 router = APIRouter()
 
@@ -16,7 +16,7 @@ async def upload_jd(jd: JobDescription):
     return response
 
 
-@router.get("/jds")
+@router.get("/jds", response_model=List[JobDescriptionListResponse])
 async def fetch_all_jds():
     """
     Fetch all Job Descriptions from the database.
