@@ -1,6 +1,13 @@
 import uuid
+import aiofiles
+from pathlib import Path
 from services.db_services import create_connection, get_all_resumes
 from utils.utility import format_datetime_to_ist
+
+
+BASE_DIR = Path(__file__).resolve().parent
+UPLOADS_DIR = BASE_DIR / "uploads" / "pdf" 
+UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 async def process_resume_pdf(file):
@@ -11,26 +18,20 @@ async def process_resume_pdf(file):
     conn = await create_connection()
     resume_id = uuid.uuid4()
     file_name = f"resume_{resume_id}.pdf"
-    file_path = f"./uploads/pdf/{file_name}"
+    file_path = f"{UPLOADS_DIR}/{file_name}"
 
-
-    with open(file_path, "wb") as f:
+    async with aiofiles.open(file_path, "wb") as f:
         content = await file.read()
-        f.write(content)
-
+        await f.write(content)
 
     insert_query = "INSERT INTO resumes(resume_id,uploaded_path,actual_name,file_format) VALUES($1, $2, $3, $4);"
-    resp = await conn.execute(insert_query, resume_id, file_path, file.filename, "pdf")
-    print(resp)
-
+    await conn.execute(insert_query, resume_id, file_path, file.filename, "pdf")
     await conn.close()
-
     return {"file_name": file_name}
 
 
 async def get_resumes():
     resumes = await get_all_resumes()
-
     clean_resumes = []
     for r in resumes:
         clean_resumes.append(
