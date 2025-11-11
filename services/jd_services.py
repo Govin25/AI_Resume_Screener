@@ -19,7 +19,7 @@ async def insert_jd_into_db(jd_text, title, company_name):
 
     await conn.close()
 
-    return {"jd_id": str(jd_id), "message": "Job description inserted successfully."}
+    return "Job description inserted successfully."
 
 
 async def get_all_jds():
