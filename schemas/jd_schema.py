@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from uuid import UUID
 
 
 class JobDescription(BaseModel):
@@ -8,7 +9,7 @@ class JobDescription(BaseModel):
 
 
 class JobDescriptionListResponse(BaseModel):
-    jd_id: str
+    jd_id: UUID
     title: str
     company_name: str
     jd_text: str

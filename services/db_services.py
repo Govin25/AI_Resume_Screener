@@ -1,23 +1,8 @@
-import asyncpg
-import os
 from models.base import session
 from models.resume import Resume
 from sqlalchemy import desc
 from fastapi import HTTPException
-
-
-async def create_connection():
-    """Create and return a connection to the PostgreSQL database."""
-    database = os.getenv("POSTGRES_DB")
-    user = os.getenv("POSTGRES_USER")
-    password = os.getenv("POSTGRES_PASSWORD")
-    host = os.getenv("POSTGRES_HOST")
-    port = os.getenv("POSTGRES_PORT")
-
-    conn = await asyncpg.connect(
-        user=user, password=password, database=database, host=host, port=port
-    )
-    return conn
+from models.jd import JobDescription
 
 
 async def get_all_resume():
@@ -55,4 +40,22 @@ async def insert_resume_db(resume_id, uploaded_path, actual_name, file_format):
     session.commit()
 
 
+#JD DATABASE SERVICES CAN BE ADDED HERE
+
+async def insert_jd_db(jd_id, title, company_name, jd_text):
+    jd_obj= JobDescription(
+        jd_id=jd_id,
+        title=title,
+        company_name=company_name,
+        jd_text=jd_text
+    )
+    session.add(jd_obj)
+    session.commit()  
+
+
+async def get_jds_db():
+
+    resp = session.query(JobDescription).order_by(desc(JobDescription.created_at)).all()
+
+    return resp
 
