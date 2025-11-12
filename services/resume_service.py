@@ -1,7 +1,7 @@
 import uuid
 import aiofiles
 from pathlib import Path
-from services.db_services import create_connection, get_all_resumes
+from services.db_services import create_connection, get_all_resume
 from utils.utility import format_datetime_to_ist
 import os
 
@@ -31,14 +31,14 @@ async def process_resume_pdf(file):
 
 
 async def get_resumes():
-    resumes = await get_all_resumes()
+    resumes = await get_all_resume()
     clean_resumes = []
     for r in resumes:
         clean_resumes.append(
             {
-                "resume_id": r["resume_id"],
-                "actual_name": r["actual_name"],
-                "created_at": format_datetime_to_ist(r["created_at"]),
+                "resume_id": r.resume_id,
+                "actual_name": r.actual_name,
+                "created_at": format_datetime_to_ist(r.created_at),
             }
         )
     return {"resumes": clean_resumes}

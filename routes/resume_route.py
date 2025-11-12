@@ -7,7 +7,7 @@ from services.resume_service import (
 )
 from fastapi.responses import FileResponse
 from uuid import UUID
-from schemas.resume_schemas import Resumes_Response, Resume_List_Response
+from schemas.resume_schemas import Resumes_Response
 
 router = APIRouter()
 

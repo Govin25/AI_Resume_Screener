@@ -1,5 +1,8 @@
 import asyncpg
 import os
+from models.base import session
+from models.resume import Resume
+from sqlalchemy import desc
 
 
 async def create_connection():
@@ -16,10 +19,8 @@ async def create_connection():
     return conn
 
 
-async def get_all_resumes():
-    conn = await create_connection()
+async def get_all_resume():
 
-    rows = await conn.fetch("SELECT * FROM resumes ORDER BY created_at DESC;")
-    await conn.close()
+    resp = session.query(Resume).order_by(desc(Resume.created_at)).all()
 
-    return [dict(row) for row in rows]
+    return resp
