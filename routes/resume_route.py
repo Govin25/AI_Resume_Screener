@@ -7,7 +7,7 @@ from services.resume_service import (
 )
 from fastapi.responses import FileResponse
 from uuid import UUID
-from schemas.resume_schemas import Resumes_Response, Resume_List_Response
+from schemas.resume_schemas import Resumes_Response
 
 router = APIRouter()
 
@@ -26,12 +26,13 @@ async def resume_upload(file: UploadFile = File(...)):
     return resp
 
 
+# DONE
 @router.get("/resumes", response_model=Resumes_Response)
 async def fetch_all_resumes():
     resumes = await get_resumes()
     return resumes
 
-
+#done
 @router.get("/resumes/{resume_id}/download") 
 async def download_resume(resume_id: UUID):
     row = await get_resume_by_id(resume_id)
