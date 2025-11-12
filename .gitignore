@@ -5,3 +5,4 @@ venv/*
 .env
 */__pycache__/*
 git-credential-manager
+services/uploads

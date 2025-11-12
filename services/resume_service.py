@@ -1,7 +1,7 @@
 import uuid
 import aiofiles
 from pathlib import Path
-from services.db_services import create_connection, get_all_resume
+from services.db_services import insert_resume_db, get_all_resume, get_resume_by_id_db, delete_resume_db
 from utils.utility import format_datetime_to_ist
 import os
 
@@ -15,7 +15,7 @@ async def process_resume_pdf(file):
     Process the uploaded PDF resume and save it to the uploads/pdf directory.
     """
 
-    conn = await create_connection()
+    
     resume_id = uuid.uuid4()
     file_name = f"resume_{resume_id}.pdf"
     file_path = f"{UPLOADS_DIR}/{file_name}"
@@ -23,10 +23,10 @@ async def process_resume_pdf(file):
     async with aiofiles.open(file_path, "wb") as f:
         content = await file.read()
         await f.write(content)
+    
+    await insert_resume_db(resume_id, file_path, file.filename, "pdf")
 
-    insert_query = "INSERT INTO resumes(resume_id,uploaded_path,actual_name,file_format) VALUES($1, $2, $3, $4);"
-    await conn.execute(insert_query, resume_id, file_path, file.filename, "pdf")
-    await conn.close()
+    
     return {"file_name": file_name}
 
 
@@ -45,14 +45,9 @@ async def get_resumes():
 
 
 async def get_resume_by_id(resume_id):
-    conn = await create_connection()
-    query = "SELECT uploaded_path, actual_name FROM resumes WHERE resume_id = $1;"
-    row = await conn.fetchrow(query, resume_id)
-    await conn.close()
+    return  await get_resume_by_id_db(resume_id)
 
-    return row
-
-
+    
 async def delete_resume_service(resume_id, path):
     file_path = Path(path)
     if file_path.exists():
@@ -61,7 +56,4 @@ async def delete_resume_service(resume_id, path):
     else:
         print(f"No file exist in disk for path: {file_path}")
 
-    conn = await create_connection()
-    query = "DELETE FROM resumes WHERE resume_id = $1;"
-    await conn.execute(query, resume_id)
-    await conn.close()
+    await delete_resume_db(resume_id)
