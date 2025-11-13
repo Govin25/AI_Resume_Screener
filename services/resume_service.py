@@ -3,7 +3,7 @@ import aiofiles
 from pathlib import Path
 from services.db_services import insert_resume_db, get_all_resume, get_resume_by_id_db, delete_resume_db
 from utils.utility import format_datetime_to_ist
-import os
+from utils.log_config import logger
 
 BASE_DIR = Path(__file__).resolve().parent
 UPLOADS_DIR = BASE_DIR / "uploads" / "pdf" 
@@ -14,7 +14,6 @@ async def process_resume_pdf(file):
     """
     Process the uploaded PDF resume and save it to the uploads/pdf directory.
     """
-
     
     resume_id = uuid.uuid4()
     file_name = f"resume_{resume_id}.pdf"
@@ -31,7 +30,11 @@ async def process_resume_pdf(file):
 
 
 async def get_resumes():
-    resumes = await get_all_resume()
+    try :
+        resumes = await get_all_resume()
+    except Exception as e:
+        raise e
+
     clean_resumes = []
     for r in resumes:
         clean_resumes.append(
@@ -41,14 +44,22 @@ async def get_resumes():
                 "created_at": format_datetime_to_ist(r.created_at),
             }
         )
+
     return {"resumes": clean_resumes}
 
 
 async def get_resume_by_id(resume_id):
-    return  await get_resume_by_id_db(resume_id)
+
+    try:
+        resp = await get_resume_by_id_db(resume_id)
+    except Exception as e:
+        raise e
+    
+    return resp
 
     
 async def delete_resume_service(resume_id, path):
+    logger.info(f"Deleting resume with ID: {resume_id} and path: {path}")
     file_path = Path(path)
     if file_path.exists():
         file_path.unlink()

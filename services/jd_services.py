@@ -1,6 +1,7 @@
 import uuid
 from services.db_services import insert_jd_db, get_jds_db
 from utils.utility import format_datetime_to_ist
+from utils.log_config import logger
 
 
 async def insert_jd_into_db(jd_text, title, company_name):
@@ -16,9 +17,8 @@ async def get_all_jds():
     """
     Retrieve all job descriptions from the database.
     """
-
-    
     rows = await get_jds_db()
+    logger.info(f"Fetched {len(rows)} job descriptions from the database.")
     response = []
     for row in rows:
         response.append(
