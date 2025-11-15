@@ -7,14 +7,15 @@ from utils.log_config import logger
 
 
 async def get_all_resume():
-
-    resp = session.query(Resume).order_by(desc(Resume.created_at)).all()
-
+    try:
+        resp = session.query(Resume).order_by(desc(Resume.created_at)).all()
+    except Exception as e:
+        logger.error(f"Error fetching all resumes: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching resumes") from e    
     return resp
 
 
 async def get_resume_by_id_db(resume_id):
-
     try:
         resp = session.query(Resume).filter(Resume.resume_id == resume_id).first()
     except Exception as e:
@@ -37,14 +38,19 @@ async def delete_resume_db(resume_id):
 
 
 async def insert_resume_db(resume_id, uploaded_path, actual_name, file_format):
-    new_resume = Resume(
+    logger.info(f"Inserting resume with ID: {resume_id}")
+    try:
+        new_resume = Resume(
         resume_id=resume_id,
         uploaded_path=uploaded_path,
         actual_name=actual_name,
         file_format=file_format,
-    )
-    session.add(new_resume)
-    session.commit()
+        )
+        session.add(new_resume)
+        session.commit()
+    except Exception as e:
+        logger.error(f"Error inserting resume: {e}")
+    raise HTTPException(status_code=500, detail="Error inserting resume") from e
 
 
 #JD DATABASE SERVICES CAN BE ADDED HERE
