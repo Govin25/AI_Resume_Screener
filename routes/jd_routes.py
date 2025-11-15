@@ -16,7 +16,7 @@ async def upload_jd(jd: JobDescription):
         response = await insert_jd_into_db(jd.jd_text, jd.title, jd.company_name)
     except Exception as e:
         logging.error(f"Error inserting job description: {e}")
-        raise HTTPException(status_code=500, detail="Error inserting job description") from e
+        raise HTTPException(status_code=500, detail="Error inserting job description")
     
     return response
 
@@ -30,5 +30,5 @@ async def fetch_all_jds():
         jds = await get_all_jds()
     except Exception as e:
         logging.error(f"Error fetching job descriptions: {e}")
-        raise HTTPException(status_code=500, detail="Error fetching job descriptions") from e
+        raise HTTPException(status_code=500, detail="Error fetching job descriptions")
     return jds

@@ -33,7 +33,7 @@ async def fetch_all_resumes():
         resumes = await get_resumes()
     except Exception as e:
         logger.error(f"Error fetching resumes: {e}")
-        raise HTTPException(status_code=500, detail="Error fetching resumes") from e
+        raise HTTPException(status_code=500, detail="Error fetching resumes")
     return resumes
 
 
@@ -45,7 +45,7 @@ async def download_resume(resume_id: UUID):
         row = await get_resume_by_id(resume_id)
     except Exception as e:
         logger.error(f"Error retrieving resume: {e}")
-        raise HTTPException(status_code=500, detail="Error retrieving resume") from e
+        raise HTTPException(status_code=500, detail="Error retrieving resume")
 
     if not row:
         raise HTTPException(status_code=404, detail=f"Resume not found for id: {resume_id}")
@@ -64,7 +64,7 @@ async def delete_resume(resume_id: UUID):
         row = await get_resume_by_id(resume_id)
     except Exception as e:
          logger.error(f"Error retrieving resume for deletion: {e}")
-         raise HTTPException(status_code=500, detail="Error retrieving resume for deletion") from e
+         raise HTTPException(status_code=500, detail="Error retrieving resume for deletion")
    
     if not row:
         raise HTTPException(status_code=404, detail=f"Resume not found for id: {resume_id}")

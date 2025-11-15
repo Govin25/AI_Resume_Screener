@@ -19,12 +19,20 @@ async def process_resume_pdf(file):
     file_name = f"resume_{resume_id}.pdf"
     file_path = f"{UPLOADS_DIR}/{file_name}"
 
-    async with aiofiles.open(file_path, "wb") as f:
-        content = await file.read()
-        await f.write(content)
+    try:
+        async with aiofiles.open(file_path, "wb") as f:
+            content = await file.read()
+            await f.write(content)
+    except Exception as e:
+        logger.error(f"Error saving uploaded resume: {e}")
+        raise e
     
-    await insert_resume_db(resume_id, file_path, file.filename, "pdf")
-
+    try:
+        await insert_resume_db(resume_id, file_path, file.filename, "pdf")
+    except Exception as e:
+        logger.error(f"Error inserting resume into database: {e}")
+        await delete_resume_service(None, file_path)
+        raise e
     
     return {"file_name": file_name}
 
@@ -67,4 +75,6 @@ async def delete_resume_service(resume_id, path):
     else:
         print(f"No file exist in disk for path: {file_path}")
 
-    await delete_resume_db(resume_id)
+    if resume_id:
+        await delete_resume_db(resume_id)
+    logger.info(f"Resume with ID: {resume_id} deleted successfully from database.")
