@@ -3,7 +3,7 @@ import aiofiles
 from pathlib import Path
 from services.db_services import insert_resume_db, get_all_resume, get_resume_by_id_db, delete_resume_db
 from utils.utility import format_datetime_to_ist
-import os
+from utils.log_config import logger
 
 BASE_DIR = Path(__file__).resolve().parent
 UPLOADS_DIR = BASE_DIR / "uploads" / "pdf" 
@@ -14,24 +14,35 @@ async def process_resume_pdf(file):
     """
     Process the uploaded PDF resume and save it to the uploads/pdf directory.
     """
-
     
     resume_id = uuid.uuid4()
     file_name = f"resume_{resume_id}.pdf"
     file_path = f"{UPLOADS_DIR}/{file_name}"
 
-    async with aiofiles.open(file_path, "wb") as f:
-        content = await file.read()
-        await f.write(content)
+    try:
+        async with aiofiles.open(file_path, "wb") as f:
+            content = await file.read()
+            await f.write(content)
+    except Exception as e:
+        logger.error(f"Error saving uploaded resume: {e}")
+        raise e
     
-    await insert_resume_db(resume_id, file_path, file.filename, "pdf")
-
+    try:
+        await insert_resume_db(resume_id, file_path, file.filename, "pdf")
+    except Exception as e:
+        logger.error(f"Error inserting resume into database: {e}")
+        await delete_resume_service(None, file_path)
+        raise e
     
     return {"file_name": file_name}
 
 
 async def get_resumes():
-    resumes = await get_all_resume()
+    try :
+        resumes = await get_all_resume()
+    except Exception as e:
+        raise e
+
     clean_resumes = []
     for r in resumes:
         clean_resumes.append(
@@ -41,14 +52,22 @@ async def get_resumes():
                 "created_at": format_datetime_to_ist(r.created_at),
             }
         )
+
     return {"resumes": clean_resumes}
 
 
 async def get_resume_by_id(resume_id):
-    return  await get_resume_by_id_db(resume_id)
+
+    try:
+        resp = await get_resume_by_id_db(resume_id)
+    except Exception as e:
+        raise e
+    
+    return resp
 
     
 async def delete_resume_service(resume_id, path):
+    logger.info(f"Deleting resume with ID: {resume_id} and path: {path}")
     file_path = Path(path)
     if file_path.exists():
         file_path.unlink()
@@ -56,4 +75,6 @@ async def delete_resume_service(resume_id, path):
     else:
         print(f"No file exist in disk for path: {file_path}")
 
-    await delete_resume_db(resume_id)
+    if resume_id:
+        await delete_resume_db(resume_id)
+    logger.info(f"Resume with ID: {resume_id} deleted successfully from database.")

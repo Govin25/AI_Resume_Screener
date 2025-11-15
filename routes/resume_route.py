@@ -8,6 +8,7 @@ from services.resume_service import (
 from fastapi.responses import FileResponse
 from uuid import UUID
 from schemas.resume_schemas import Resumes_Response
+from utils.log_config import logger
 
 router = APIRouter()
 
@@ -26,16 +27,25 @@ async def resume_upload(file: UploadFile = File(...)):
     return resp
 
 
-# DONE
 @router.get("/resumes", response_model=Resumes_Response)
 async def fetch_all_resumes():
-    resumes = await get_resumes()
+    try :
+        resumes = await get_resumes()
+    except Exception as e:
+        logger.error(f"Error fetching resumes: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching resumes")
     return resumes
 
-#done
+
 @router.get("/resumes/{resume_id}/download") 
 async def download_resume(resume_id: UUID):
-    row = await get_resume_by_id(resume_id)
+    logger.info(f"Downloading resume with ID: {resume_id}")
+
+    try:
+        row = await get_resume_by_id(resume_id)
+    except Exception as e:
+        logger.error(f"Error retrieving resume: {e}")
+        raise HTTPException(status_code=500, detail="Error retrieving resume")
 
     if not row:
         raise HTTPException(status_code=404, detail=f"Resume not found for id: {resume_id}")
@@ -50,13 +60,16 @@ async def download_resume(resume_id: UUID):
 
 @router.delete("/resumes/{resume_id}")
 async def delete_resume(resume_id: UUID):
+    try:
+        row = await get_resume_by_id(resume_id)
+    except Exception as e:
+         logger.error(f"Error retrieving resume for deletion: {e}")
+         raise HTTPException(status_code=500, detail="Error retrieving resume for deletion")
    
-   row = await get_resume_by_id(resume_id)
-   
-   if not row:
+    if not row:
         raise HTTPException(status_code=404, detail=f"Resume not found for id: {resume_id}")
 
-   path = dict(row)['uploaded_path']
-   await delete_resume_service(resume_id, path) 
+    path = dict(row)['uploaded_path']
+    await delete_resume_service(resume_id, path) 
 
-   return f"Resume {resume_id} delete successfully"
+    return f"Resume {resume_id} delete successfully"
