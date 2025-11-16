@@ -82,4 +82,3 @@ async def get_jds_db():
         raise HTTPException(status_code=500, detail="Error fetching job descriptions") 
 
     return resp
-

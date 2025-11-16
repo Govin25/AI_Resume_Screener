@@ -4,6 +4,8 @@ load_dotenv()
 
 from routes.resume_route import router as resume_router
 from routes.jd_routes import router as jd_router
+from routes.user_routes import router as user_router
+
 from models.base import Base, engine, session
 import models
 from contextlib import asynccontextmanager
@@ -31,4 +33,5 @@ async def health_check():
 app.include_router(resume_router, tags=["Resume"])
 
 app.include_router(jd_router, tags=["Job Description"])
+app.include_router(user_router, tags=["User"])
 
