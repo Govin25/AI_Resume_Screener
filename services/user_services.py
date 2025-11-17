@@ -7,6 +7,12 @@ from fastapi import HTTPException
 from models.base import session 
 from models.user import User
 
+async def get_user_by_email(email: str):
+    """
+    Validate that the email is unique in the database.
+    """
+    user = session.query(User).filter(User.email == email).first()
+    return user
 
 
 async def validate_email_unique(email: str):
@@ -15,7 +21,7 @@ async def validate_email_unique(email: str):
     """
     existing_user = session.query(User).filter(User.email == email).first()
     if existing_user:
-        raise ValueError("Email already exists.")
+        raise EmailAlreadExists("Email already exists.")
     
     return existing_user
 
@@ -40,7 +46,9 @@ async def create_user(user_data:UserCreate):
         )
         session.add(new_user)
         session.commit()
-
+    
+    except EmailAlreadExists as e:
+        raise e
     except Exception as e:
         logger.error(f"Error creating user: {e}")
         raise e
@@ -101,7 +109,8 @@ async def delete_user_by_id(user_id):
     
 
     
-
+class EmailAlreadExists(Exception):
+    pass
 
     
 

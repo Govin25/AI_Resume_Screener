@@ -1,4 +1,4 @@
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, HTTPException, UploadFile, Depends
 from services.resume_service import (
     process_resume_pdf,
     get_resumes,
@@ -9,12 +9,15 @@ from fastapi.responses import FileResponse
 from uuid import UUID
 from schemas.resume_schemas import Resumes_Response
 from utils.log_config import logger
-
+from utils.jwt_handler import get_authenticated_user
 router = APIRouter()
 
 
 @router.post("/resume_upload")
-async def resume_upload(file: UploadFile = File(...)):
+async def resume_upload(file: UploadFile = File(...), user_id: UUID = Depends(get_authenticated_user)):
+
+    logger.info(f"resume uploaded by user: {user_id}")
+
     extension = file.filename.split(".")[-1].lower()
 
     if extension not in ["pdf"]:
@@ -28,7 +31,7 @@ async def resume_upload(file: UploadFile = File(...)):
 
 
 @router.get("/resumes", response_model=Resumes_Response)
-async def fetch_all_resumes():
+async def fetch_all_resumes(user_id: UUID = Depends(get_authenticated_user)):
     try :
         resumes = await get_resumes()
     except Exception as e:
@@ -38,7 +41,7 @@ async def fetch_all_resumes():
 
 
 @router.get("/resumes/{resume_id}/download") 
-async def download_resume(resume_id: UUID):
+async def download_resume(resume_id: UUID, user_id: UUID = Depends(get_authenticated_user)):
     logger.info(f"Downloading resume with ID: {resume_id}")
 
     try:
@@ -59,7 +62,7 @@ async def download_resume(resume_id: UUID):
 
 
 @router.delete("/resumes/{resume_id}")
-async def delete_resume(resume_id: UUID):
+async def delete_resume(resume_id: UUID, user_id: UUID = Depends(get_authenticated_user)):
     try:
         row = await get_resume_by_id(resume_id)
     except Exception as e:
