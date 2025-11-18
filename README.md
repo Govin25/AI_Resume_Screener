@@ -90,3 +90,12 @@ ACCESS_TOKEN_EXPIRE_DAYS = 7
     uv run fastapi dev
 ```
 
+
+### ✅ 5. Check it
+
+Go to any browser and run the following url to list all available endpoints
+
+```bash
+    http://localhost:8000/docs
+```
+
