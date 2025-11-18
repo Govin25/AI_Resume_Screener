@@ -15,12 +15,13 @@ async def upload_jd(jd: JobDescription, user_id: UUID = Depends(get_authenticate
     Upload a Job Description directly as text data.
     """
     try:
-        response = await insert_jd_into_db(jd.jd_text, jd.title, jd.company_name)
+        response = await insert_jd_into_db(jd.jd_text, jd.title, jd.company_name, user_id)
     except Exception as e:
         logging.error(f"Error inserting job description: {e}")
         raise HTTPException(status_code=500, detail="Error inserting job description")
     
     return response
+
 
 
 @router.get("/jds", response_model=List[JobDescriptionListResponse])
@@ -29,7 +30,7 @@ async def fetch_all_jds(user_id: UUID = Depends(get_authenticated_user)):
     Fetch all Job Descriptions from the database.
     """
     try:
-        jds = await get_all_jds()
+        jds = await get_all_jds(user_id)
     except Exception as e:
         logging.error(f"Error fetching job descriptions: {e}")
         raise HTTPException(status_code=500, detail="Error fetching job descriptions")

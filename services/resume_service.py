@@ -10,7 +10,7 @@ UPLOADS_DIR = BASE_DIR / "uploads" / "pdf"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-async def process_resume_pdf(file):
+async def process_resume_pdf(file, user_id):
     """
     Process the uploaded PDF resume and save it to the uploads/pdf directory.
     """
@@ -28,7 +28,7 @@ async def process_resume_pdf(file):
         raise e
     
     try:
-        await insert_resume_db(resume_id, file_path, file.filename, "pdf")
+        await insert_resume_db(resume_id, file_path, file.filename, "pdf", user_id)
     except Exception as e:
         logger.error(f"Error inserting resume into database: {e}")
         await delete_resume_service(None, file_path)
@@ -37,9 +37,9 @@ async def process_resume_pdf(file):
     return {"file_name": file_name}
 
 
-async def get_resumes():
+async def get_resumes(user_id):
     try :
-        resumes = await get_all_resume()
+        resumes = await get_all_resume(user_id)
     except Exception as e:
         raise e
 
