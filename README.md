@@ -62,7 +62,7 @@ Add following configurations
 ```
 POSTGRES_USER = postgres
 POSTGRES_PASSWORD = password
-POSTGRES_DB = db
+POSTGRES_DB = db_name
 POSTGRES_HOST = localhost
 POSTGRES_PORT = 5432
 SECRET_KEY = your_secret_key
@@ -72,7 +72,19 @@ ACCESS_TOKEN_EXPIRE_DAYS = 7
 ```
 
 
-### ✅ 3. Run the Server
+### ✅ 3. Create following tables in postgres
+
+* Go into the bash shell and run the following command
+
+
+```bash
+    psql -U user -d db_name
+```
+
+* Execute the tables from **db_schema.txt** file inside the postgres shell.
+
+
+### ✅ 4. Run the Server
 
 ```bash
     uv run fastapi dev
