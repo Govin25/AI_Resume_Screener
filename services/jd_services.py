@@ -4,14 +4,14 @@ from utils.utility import format_datetime_to_ist
 from utils.log_config import logger
 
 
-async def insert_jd_into_db(jd_text, title, company_name):
+async def insert_jd_into_db(jd_text, title, company_name, user_id):
     """
     Insert a new job description into the database.
     """
     jd_id = uuid.uuid4()
     logger.info(f"Inserting job description with ID: {jd_id}")
     try:
-        await insert_jd_db(jd_id, title, company_name, jd_text)
+        await insert_jd_db(jd_id, title, company_name, jd_text, user_id)
     except Exception as e:
         logger.error(f"Error inserting job description: {e}")
         raise e
@@ -19,12 +19,12 @@ async def insert_jd_into_db(jd_text, title, company_name):
     return "Job description inserted successfully."
 
 
-async def get_all_jds():
+async def get_all_jds(user_id):
     """
     Retrieve all job descriptions from the database.
     """
     try:
-        rows = await get_jds_db()
+        rows = await get_jds_db(user_id)
         logger.info(f"Fetched {len(rows)} job descriptions from the database.")
     except Exception as e:
         logger.error(f"Error fetching job descriptions: {e}")

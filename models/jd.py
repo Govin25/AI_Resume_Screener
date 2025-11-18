@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, TIMESTAMP, func, UUID
+from sqlalchemy import Column, String, Text, TIMESTAMP, func, UUID, ForeignKey
 from models.base import Base
 
 
@@ -11,4 +11,7 @@ class JobDescription(Base):
     jd_text = Column(Text, nullable=False)
     status = Column(String(50), nullable=False, default='active')
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"))
 

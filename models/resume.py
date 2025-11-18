@@ -1,5 +1,5 @@
 from models.base import Base
-from sqlalchemy import Column, String, TIMESTAMP, UUID, func
+from sqlalchemy import Column, String, TIMESTAMP, UUID, func, ForeignKey
 
 
 class Resume(Base):
@@ -10,5 +10,8 @@ class Resume(Base):
     actual_name = Column(String(255), nullable=False)
     file_format = Column(String(20), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"))
 
 

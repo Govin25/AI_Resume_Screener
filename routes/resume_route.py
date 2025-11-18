@@ -25,7 +25,7 @@ async def resume_upload(file: UploadFile = File(...), user_id: UUID = Depends(ge
             status_code=400, detail="Unsupported file type. Only PDF  are allowed."
         )
 
-    resp = await process_resume_pdf(file)
+    resp = await process_resume_pdf(file, user_id)
 
     return resp
 
@@ -33,7 +33,7 @@ async def resume_upload(file: UploadFile = File(...), user_id: UUID = Depends(ge
 @router.get("/resumes", response_model=Resumes_Response)
 async def fetch_all_resumes(user_id: UUID = Depends(get_authenticated_user)):
     try :
-        resumes = await get_resumes()
+        resumes = await get_resumes(user_id)
     except Exception as e:
         logger.error(f"Error fetching resumes: {e}")
         raise HTTPException(status_code=500, detail="Error fetching resumes")
@@ -71,6 +71,9 @@ async def delete_resume(resume_id: UUID, user_id: UUID = Depends(get_authenticat
    
     if not row:
         raise HTTPException(status_code=404, detail=f"Resume not found for id: {resume_id}")
+
+    if row.user_id != user_id:
+        raise HTTPException(status_code=401, detail=f"User not authorized to delete: {resume_id}")
 
     path = dict(row)['uploaded_path']
     await delete_resume_service(resume_id, path) 
