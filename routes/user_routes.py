@@ -29,7 +29,7 @@ async def get_users(user_id: UUID = Depends(get_authenticated_user)):
         resp = await get_all_users()
     except Exception as e:
         logger.error(f"Error getting user: {e}")
-        raise HTTPException(status_code=500, detail="Error get users")
+        raise HTTPException(status_code=500, detail="Error getting users")
     return resp
 
 
@@ -38,13 +38,12 @@ async def get_user(user_id:UUID, user: UUID = Depends(get_authenticated_user)):
     logger.info(f"GET user with ID:{user_id}") 
     try:
         row = await get_user_by_id(user_id)
+    except HTTPException as he:
+        raise he
     except Exception as e:
         logger.error(f"Error retrieving user: {e}")
         raise HTTPException(status_code=500, detail="Error retrieving user")
 
-    if not row:
-        raise HTTPException(status_code=404, detail=f"User not found for id: {user_id}")
-    
     return row
 
 

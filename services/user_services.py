@@ -56,14 +56,18 @@ async def create_user(user_data:UserCreate):
     return {"user_id":u_id,
             "message":"User created successfully"}
 
-async def get_all_users():
-    
+
+async def get_all_users_db():
     try :
         users = session.query(User).order_by(desc(User.created_at)).all()
     except Exception as e:
         logger.error(f"error fethcing all users:{e}")
         raise HTTPException(status_code=500, detail="Error fetching users")
-    
+    return users
+
+
+async def get_all_users():
+    users = await get_all_users_db()
     user_detail=[]
     for u in users:
         user_detail.append({
@@ -72,14 +76,20 @@ async def get_all_users():
             "email":u.email 
         })
         
-    return user_detail 
+    return user_detail
 
-async def get_user_by_id(user_id):
+async def get_user_by_id_into_db(user_id):
     try:
         resp = session.query(User).filter(User.user_id==user_id).first()
     except Exception as e:
         logger.error(f"Error fetching user by ID: {e}")
         raise HTTPException(status_code=500, detail="Error fetching user")
+
+    return resp 
+
+async def get_user_by_id(user_id):
+
+    resp = await get_user_by_id_into_db(user_id)
     
     if resp is None:
         raise HTTPException(status_code=404, detail=f"User not found for id: {user_id}")
@@ -101,12 +111,6 @@ async def delete_user_by_id(user_id):
 
     logger.info(f"User deleted successfully: {user_id}")
     return True
-
-
-
-    
-
-    
 
     
 class EmailAlreadExists(Exception):
