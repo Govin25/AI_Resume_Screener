@@ -10,6 +10,8 @@ host = os.getenv("POSTGRES_HOST")
 port = os.getenv("POSTGRES_PORT")
 
 DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{database}"
+SQLITE_DATABASE_URL = f"sqlite:///{database}.db"
+
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
